@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<title>Examples</title>
+	<script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&amp;ak=c5bAV1QzSlHHzKTj3rFkWRO7Ok2pom9n"></script>
+	<script type="text/javascript">
+		(function(){        //闭包
+			function load_script(xyUrl, callback){
+			    var head = document.getElementsByTagName('head')[0];
+			    var script = document.createElement('script');
+			    script.type = 'text/javascript';
+			    script.src = xyUrl;
+			    //借鉴了jQuery的script跨域方法
+			    script.onload = script.onreadystatechange = function(){
+				if((!this.readyState || this.readyState === "loaded" || this.readyState === "complete")){
+				    callback && callback();
+				    // Handle memory leak in IE
+				    script.onload = script.onreadystatechange = null;
+				    if ( head && script.parentNode ) {
+					head.removeChild( script );
+				    }
+				}
+			    };
+			    // Use insertBefore instead of appendChild  to circumvent an IE6 bug.
+			    head.insertBefore( script, head.firstChild );
+			}
+			function translate(point,type,callback){
+			    var callbackName = 'cbk_' + Math.round(Math.random() * 10000);    //随机函数名
+			    var xyUrl = "https://api.map.baidu.com/ag/coord/convert?from="+ type + "&to=4&x=" + point.lng + "&y=" + point.lat + "&callback=BMap.Convertor." + callbackName;
+			    //动态创建script标签
+			    load_script(xyUrl);
+			    BMap.Convertor[callbackName] = function(xyResult){
+				delete BMap.Convertor[callbackName];    //调用完需要删除该函数
+				var point = new BMap.Point(xyResult.x, xyResult.y);
+				callback && callback(point);
+			    }
+			}
+			window.BMap = window.BMap || {};
+			BMap.Convertor = {};
+			BMap.Convertor.translate = translate;
+		})();
+	</script>
+</head>
+<body>
+	<div id="text"></div>
+	<pre id="data"></pre>
+  <script type="text/javascript">
+  if(navigator.geolocation){
+	navigator.geolocation.getCurrentPosition(function(e) {
+		var text = '定位成功\ntimestamp: ' + e.timestamp + '\n' 
+		for(var key in e.coords){
+			text +=  key + ': ' + e.coords[key] + '\n' 
+		}
+		
+		// 百度地图坐标转换
+		BMap.Convertor.translate(new BMap.Point(e.coords.longitude, e.coords.latitude), 0, function(point){
+			text += '\n坐标转换为百度坐标系：' + JSON.stringify(point)
+			new BMap.Geocoder().getLocation(point, function(positionInfo) {
+				document.querySelector('#text').innerText = text
+				document.querySelector('#data').innerText = JSON.stringify(positionInfo, ['address', 'addressComponents', 'business', 'point', 'surroundingPois', 'lat', 'lng', 'city', 'district' ,'province', 'address', 'street', 'title'], 2)
+			})
+			
+		})
+	}, function(err) {
+		var text = '定位失败\n'
+		for(var key in err){
+			text += key + ': ' + err[key] + '\n'
+		}
+		document.querySelector('#text').innerText = text
+	}, {
+		// 指示浏览器获取高精度的位置，默认为false
+		enableHighAcuracy: true,
+		
+		// 指定获取地理位置的超时时间，默认不限时，单位为毫秒
+		timeout: 8000,
+		
+		// 最长有效期，在重复获取地理位置时，此参数指定多久再次获取位置。
+		maximumAge: 6e5
+	})
+   }else{
+	    alert('不支持navigator.geolocation')
+   }
+  </script>
+</body>
+</html>
