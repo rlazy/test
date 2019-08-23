@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+ <head> 
+  <meta charset="utf-8" /> 
+  <title>W3Cschool教程(w3cschool.cn)</title> 
+ </head> 
+ <body> 
+  <textarea id="text" style="width:280px;height:430px;word-break:break-all;padding:10px;font-family:Arial;font-size: 30px;line-height: 1.5;"></textarea> 
+  <canvas id="myCanvas" width="300" height="450" style="border:1px solid #d3d3d3;">
+    您的浏览器不支持 HTML5 canvas 标签 
+  </canvas> 
+  <script>
+var t=document.getElementById("text");
+console.log('textarea width: ', t.clientWidth)
+var c=document.getElementById("myCanvas");
+var context=c.getContext("2d");
+context.font="30px Arial";
+
+fill = function(t,x,y,w) {
+
+
+  var chr = t.split("");
+	var temp = "";				
+	var row = [];
+	var lineHeight = 1.5 * 30
+	context.font = "30px Arial";
+	lastX = 0
+	for(var a = 0; a < chr.length; a++){
+	    if(chr[a] === '\n'){
+	        temp += chr[a];
+    	     row.push(temp)
+    	     temp = ''
+    	   //  console.log(row)
+    	     continue  
+	    }
+	    lastX = context.measureText(temp + chr[a]).width
+	    
+		if( lastX < w ){
+		  //  console.log(temp, lastX)
+
+			temp += chr[a];
+		} else {
+			row.push(temp);
+			temp = chr[a];
+		}
+		
+	}
+	
+	row.push(temp); // last
+	lastY = 0
+	for(var b = 0; b < row.length; b++){
+	    lastY = y+(b+1) * lineHeight
+		context.fillText(row[b],x,lastY);
+	}
+	return {
+	    x: 10 + lastX, // padding
+	    y: 10 + lastY
+	}
+}
+timer = null
+t.addEventListener('keyup',function(e){
+    timer && clearTimeout(timer)
+
+    timer = setTimeout(_ => {
+        context.clearRect(0,0,300,150)
+        selText = t.value.substring(0, t.selectionStart)
+        console.log(selText)
+        console.log(fill(selText,10,0,280))
+    }, 3000)
+  
+})
+</script>  
+ </body>
+</html>
