@@ -62,7 +62,7 @@ t.addEventListener('keyup',function(e){
     timer && clearTimeout(timer)
 
     timer = setTimeout(_ => {
-        context.clearRect(0,0,300,150)
+        context.clearRect(0,0,t.clientWidth,t.clientHeight)
         selText = t.value.substring(0, t.selectionStart)
         console.log(selText)
         console.log(fill(selText,10,0,280))
