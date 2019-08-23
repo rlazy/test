@@ -2,15 +2,21 @@
 <html>
  <head> 
   <meta charset="utf-8" /> 
-  <title>W3Cschool教程(w3cschool.cn)</title> 
+  <title>xxx</title> 
  </head> 
  <body> 
   <textarea id="text" style="width:280px;height:430px;word-break:break-all;padding:10px;font-family:Arial;font-size: 30px;line-height: 1.5;"></textarea> 
   <canvas id="myCanvas" width="300" height="450" style="border:1px solid #d3d3d3;">
     您的浏览器不支持 HTML5 canvas 标签 
   </canvas> 
+  <div>
+  x: <i id="x"></i> <br>
+  y: <i id="y"></i>
+  </div>
   <script>
 var t=document.getElementById("text");
+var Dx=document.getElementById("x")
+var Dy=document.getElementById("y")
 console.log('textarea width: ', t.clientWidth)
 var c=document.getElementById("myCanvas");
 var context=c.getContext("2d");
@@ -65,7 +71,10 @@ t.addEventListener('keyup',function(e){
         context.clearRect(0,0,t.clientWidth,t.clientHeight)
         selText = t.value.substring(0, t.selectionStart)
         console.log(selText)
-        console.log(fill(selText,10,0,280))
+	let data = fill(selText,10,0,280)
+	Dx.innerText = data.x
+	Dy.innerText = data.y
+        console.log(data)
     }, 3000)
   
 })
